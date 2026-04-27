@@ -11,6 +11,14 @@ export function formatRelativeTime(dateString: string): string {
   return new Date(dateString).toLocaleDateString("vi-VN");
 }
 
+export function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString("vi-VN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function sourceLabel(source: string | null): string {
   if (source === "facebook") return "Facebook";
   if (source === "substack") return "Substack";

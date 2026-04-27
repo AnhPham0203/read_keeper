@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #FAF7F2;
+  --color-surface: #F2EDE4;
+  --color-accent: #8B6F47;
+  --color-text: #2C2420;
+  --font-serif: var(--font-lora);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background-color: #FAF7F2;
+  color: #2C2420;
+  font-family: var(--font-inter), sans-serif;
+}

@@ -4,6 +4,7 @@
 // ── State ──────────────────────────────────────────────────────────────────
 let tags = [];
 let pageUrl = "";
+let pageData = {}; // enriched data from content.js
 
 // ── DOM refs ───────────────────────────────────────────────────────────────
 const mainView      = document.getElementById("main-view");
@@ -32,10 +33,12 @@ chrome.storage.sync.get(["apiUrl", "authToken"], ({ apiUrl, authToken }) => {
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     pageUrl = tab.url || "";
     titleInput.value = tab.title || "";
+    pageData = { url: pageUrl, title: tab.title || "", source: detectSource(pageUrl) };
 
-    // Ask content script for richer metadata (JOB-007 expands this)
+    // Ask content script for full extracted metadata
     chrome.tabs.sendMessage(tab.id, { type: "GET_PAGE_INFO" }, (res) => {
       if (chrome.runtime.lastError || !res) return;
+      pageData = { ...pageData, ...res };
       if (res.title) titleInput.value = res.title;
       if (res.url)   pageUrl = res.url;
     });
@@ -132,9 +135,9 @@ saveBtn.addEventListener("click", () => {
           "Authorization": `Bearer ${authToken}`,
         },
         body: JSON.stringify({
-          url:    pageUrl,
-          title,
-          source: detectSource(pageUrl),
+          ...pageData,   // content, author, thumbnail_url, source from extractor
+          url:   pageUrl,
+          title,         // user-edited title takes precedence
           tags,
         }),
       });

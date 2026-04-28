@@ -1,7 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 export async function proxy(request: NextRequest) {
+  const isApi = request.nextUrl.pathname.startsWith("/api/");
+
+  // Return CORS pre-flight immediately — no auth check needed
+  if (request.method === "OPTIONS" && isApi) {
+    return new NextResponse(null, { status: 204, headers: CORS });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -25,8 +38,12 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Refresh session so it doesn't expire mid-visit
   await supabase.auth.getUser();
+
+  // Attach CORS headers to every API response
+  if (isApi) {
+    Object.entries(CORS).forEach(([k, v]) => supabaseResponse.headers.set(k, v));
+  }
 
   return supabaseResponse;
 }

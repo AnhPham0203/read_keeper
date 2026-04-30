@@ -8,6 +8,7 @@ import TagFilter from "@/components/TagFilter";
 import ArticleCard from "@/components/ArticleCard";
 import EmptyState from "@/components/EmptyState";
 import Pagination from "@/components/Pagination";
+import LogoutButton from "@/components/LogoutButton";
 
 const LIMIT = 20;
 
@@ -141,7 +142,10 @@ function Shell({
     <div className="min-h-screen bg-[#FAF7F2]">
       <header className="border-b border-[#E2D9CC] bg-[#FAF7F2] sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <h1 className="font-serif text-xl text-[#2C2420] mb-3">Readkeeper</h1>
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="font-serif text-xl text-[#2C2420]">Readkeeper</h1>
+            <LogoutButton />
+          </div>
           <Suspense>
             <SearchBar initialValue={q} />
           </Suspense>

@@ -8,9 +8,11 @@ const CORS = {
 };
 
 export async function proxy(request: NextRequest) {
-  const isApi = request.nextUrl.pathname.startsWith("/api/");
+  const path = request.nextUrl.pathname;
+  const isApi     = path.startsWith("/api/");
+  const isPublic  = path.startsWith("/login") || path.startsWith("/auth/");
 
-  // Return CORS pre-flight immediately — no auth check needed
+  // CORS preflight — return immediately
   if (request.method === "OPTIONS" && isApi) {
     return new NextResponse(null, { status: 204, headers: CORS });
   }
@@ -38,9 +40,20 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  // Refresh session (updateSession equivalent with @supabase/ssr)
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // Attach CORS headers to every API response
+  // Guard: unauthenticated → redirect to /login
+  if (!isApi && !isPublic && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // Already logged in → skip /login
+  if (path === "/login" && user) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Attach CORS headers to API responses
   if (isApi) {
     Object.entries(CORS).forEach(([k, v]) => supabaseResponse.headers.set(k, v));
   }

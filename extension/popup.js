@@ -153,7 +153,7 @@ saveBtn.addEventListener("click", () => {
       } else {
         setStatus("✅ Đã lưu!", "success");
         saveBtn.textContent = "✓ Đã lưu";
-        // Keep button disabled — article is saved
+        setTimeout(() => window.close(), 1500);
       }
     } catch {
       setStatus("❌ Không kết nối được server", "error");

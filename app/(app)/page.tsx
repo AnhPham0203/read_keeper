@@ -80,7 +80,7 @@ export default async function HomePage({
   if (q) query = query.textSearch("search_vector", q, { config: "simple", type: "websearch" });
 
   const { data: raw, count, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error(`Không thể tải danh sách bài: ${error.message}`);
 
   const total = count ?? 0;
   const totalPages = Math.ceil(total / LIMIT);
